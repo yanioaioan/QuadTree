@@ -43,7 +43,7 @@
      }
 
 
-     unsigned int maxCapacity=100;
+     unsigned int maxCapacity=200;
 
      void split()
      {
