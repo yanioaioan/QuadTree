@@ -8,7 +8,7 @@
 #include <ngl/Random.h>
 #include <QTime>
 
-const static int totalCollisionObjects=20000;
+const static int totalCollisionObjects=10000;
 
 //Initialize QuadTree
 QuadTree tree(0,0,totalCollisionObjects,totalCollisionObjects);
@@ -55,7 +55,7 @@ void NGLScene::initializeGL ()
     glClearColor (0.4,0.4,0.4,1);
     std::cout<<"Initializing NGL\n";
 
-    ngl::Vec3 from(0.5,0.4,1);ngl::Vec3 to(0.5,0.4,0);ngl::Vec3 up(0,1,0);
+    ngl::Vec3 from(2,0.4,1);ngl::Vec3 to(0.5,0.4,0);ngl::Vec3 up(0,1,0);
     m_cam = new ngl::Camera(from,to,up);
     m_cam->setShape(45,(float)720/576,0.05,350);
 
@@ -86,8 +86,8 @@ void NGLScene::initializeGL ()
     for(int i=0;i<totalCollisionObjects;i++)
     {
        ngl::Random *rng=ngl::Random::instance ();
-       int x = (int)rng->randomPositiveNumber (totalCollisionObjects)%totalCollisionObjects;
-       int y = (int)rng->randomPositiveNumber (totalCollisionObjects)%totalCollisionObjects;
+       int x = (int)rng->randomPositiveNumber (totalCollisionObjects);
+       int y = (int)rng->randomPositiveNumber (totalCollisionObjects);
 
        //save positions
        Point t(x,y);
@@ -99,9 +99,9 @@ void NGLScene::initializeGL ()
 
 
     //find & get the collision neighbours of Point a(8,8), if (8,8) is in the tree
-    Point a(3,3);
-    //Point a(2530,7399);
-    /*tree.*/getPointCollisions(a,&tree);
+//    Point a(3,3);
+    //Point a(2530,7399);    
+//    getPointCollisions(a,&tree);
 
     currenttime.start ();
     tmpTimeElapsed = 0;
@@ -157,16 +157,19 @@ void NGLScene::detectAndResolveCollisions(Point &a, std::vector<Point> *collisio
 //          a.y=0.0001;
 
            //calculate x intersection
-           float xOffset=abs(a.x-(*collisionAreaPoints)[i].x);
-           float yOffset=abs(a.y-(*collisionAreaPoints)[i].y);
+           float xOffset=/*abs*/(a.x-(*collisionAreaPoints)[i].x);
+           float yOffset=/*abs*/(a.y-(*collisionAreaPoints)[i].y);
 
            //this point make resovles collisions, and makes it run fast
            //(IF commented out it runs slower)
-           a.x+=2*xOffset; a.y+=2*yOffset;
-           (*collisionAreaPoints)[i].x-=2*xOffset; (*collisionAreaPoints)[i].y-=2*yOffset;
 
+           //move point / push away
+           a.x+=xOffset;
+           a.y+=yOffset;
+
+//           (*collisionAreaPoints)[i].x+=xOffset;
+//           (*collisionAreaPoints)[i].y+=yOffset;
        }
-
 
 
     }
@@ -263,7 +266,7 @@ void NGLScene::getPointCollisions(Point &a, QuadTree *tree)
             for(int i=0;i<collisionAreaPoints->size ();i++)
             {
                 m_transform.setPosition ( (*collisionAreaPoints)[i].x/totalCollisionObjects ,(*collisionAreaPoints)[i].y/totalCollisionObjects, 0);
-                m_transform.setScale (0.015,0.015,1);
+                m_transform.setScale (0.01, 0.01, 1);
 
                 loadMatricesToShader (m_transform,m_mouseGlobalTX, m_cam, collisionAreaColour);
                 ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance ();
@@ -337,7 +340,7 @@ void NGLScene::findTreeElements(QuadTree &tree)
 
         for(int i=0;i<collisionAreaPoints.size ();i++)
         {
-            m_transform.setPosition (collisionAreaPoints[i].x/totalCollisionObjects ,collisionAreaPoints[i].y/totalCollisionObjects, 0);
+            m_transform.setPosition (collisionAreaPoints[i].x ,collisionAreaPoints[i].y, 0);
             m_transform.setScale (0.015,0.015,0.015);
 
             loadMatricesToShader (m_transform,m_mouseGlobalTX, m_cam, collisionAreaColour);
@@ -379,6 +382,9 @@ void NGLScene::findTreeElements(QuadTree &tree)
 
 void NGLScene::deleteAreaByAreaElements(QuadTree &tree)
 {
+    ngl::ShaderLib *shader = ngl::ShaderLib::instance ();
+     (*shader)["nglDiffuseShader"]->use();
+
     if (tree.container.size ()!=0)
     {
         //std::vector<Point> collisionAreaPoints(tree.container);
@@ -418,7 +424,7 @@ void NGLScene::deleteAreaByAreaElements(QuadTree &tree)
     }
     if (tree.dl!=NULL)
     {
-        tree.dl->container.clear ();
+//        tree.dl->container.clear ();
         updateGL ();
     }
     if (tree.dr!=NULL)
