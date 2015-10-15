@@ -27,10 +27,10 @@ QTime currenttime;
 double tmpTimeElapsed=0;
 int fps=0;
 
-NGLScene::NGLScene(QWidget *_parent): QGLWidget(_parent)
+NGLScene::NGLScene()
 {
     setFocusPolicy(Qt::StrongFocus);//to make the keyevents respond
-     this->resize(_parent->size ());
+//     this->resize(_parent->size ());
 
     // re-size the widget to that of the parent (in this case the GLFrame passed in on construction)
     m_rotate=false;
@@ -116,7 +116,7 @@ void NGLScene::resizeGL (QResizeEvent *_event )
     glViewport(0,0,w,h);
     // now set the camera size values as the screen size has changed
     m_cam->setShape(45,(float)w/h,0.05,350);
-    updateGL ();
+    update ();
 }
 
 ngl::Mat4 MV;
@@ -401,7 +401,7 @@ void NGLScene::deleteAreaByAreaElements(QuadTree &tree)
             prim->draw ("cube");
         }
 
-        updateGL ();
+        update ();
 
     }
     else
@@ -415,22 +415,22 @@ void NGLScene::deleteAreaByAreaElements(QuadTree &tree)
     if (tree.ul!=NULL)
     {
 //        tree.ul->container.clear ();
-        updateGL ();
+        update ();
     }
     if (tree.ur!=NULL)
     {
 //        tree.ur->container.clear ();
-        updateGL ();
+        update ();
     }
     if (tree.dl!=NULL)
     {
 //        tree.dl->container.clear ();
-        updateGL ();
+        update ();
     }
     if (tree.dr!=NULL)
     {
 //        tree.dr->container.clear ();
-        updateGL ();
+        update ();
     }
 
 }
@@ -513,7 +513,7 @@ void NGLScene::testButtonClicked(bool b)
     //delete some of the 1st level nodes of the tree
     deleteAreaByAreaElements(tree);
 
-    updateGL ();
+    update ();
 }
 
 
@@ -529,7 +529,7 @@ void NGLScene::timerEvent( QTimerEvent *_event )
         }
 
 
-        updateGL ();
+        update ();
     }
 }
 
@@ -547,7 +547,7 @@ void NGLScene::mouseMoveEvent (QMouseEvent * _event)
     m_spinYFace += (float) 0.5f * diffx;
     m_origX = _event->x();
     m_origY = _event->y();
-    updateGL ();
+    update ();
   }
         // right mouse translate code
   else if(m_translate && _event->buttons() == Qt::RightButton)
@@ -558,7 +558,7 @@ void NGLScene::mouseMoveEvent (QMouseEvent * _event)
     m_origYPos=_event->y();
     m_modelPos.m_x += INCREMENT * diffX;
     m_modelPos.m_y -= INCREMENT * diffY;
-    updateGL();
+    update();
 
    }
 }
@@ -614,7 +614,7 @@ void NGLScene::wheelEvent(QWheelEvent *_event)
     {
         m_modelPos.m_z-=ZOOM;
     }
-    updateGL();
+    update();
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -634,5 +634,5 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
   }
   // finally update the GLWindow and re-draw
 //  if (isExposed())
-    updateGL();
+    update();
 }

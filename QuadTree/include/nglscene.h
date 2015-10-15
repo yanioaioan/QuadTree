@@ -9,6 +9,7 @@
 #include <iostream>
 #include <algorithm>
 #include <ngl/Text.h>
+#include <QOpenGLWidget>
 
 //unsigned static int maxCapacity;
 
@@ -250,12 +251,12 @@
  //Binary Search Tree
 
 
-class NGLScene: public QGLWidget
+class NGLScene: public QOpenGLWidget
 {
     Q_OBJECT
 public:
 
-    NGLScene(QWidget *_parent);
+    NGLScene();
     ~NGLScene();
 
     float m_rColor;

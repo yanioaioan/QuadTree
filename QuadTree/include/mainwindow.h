@@ -23,6 +23,9 @@ private:
     Ui::MainWindow *ui;
     /// @brief our openGL widget
     NGLScene *m_gl;
+
+//    QWidget *centralWidget; = new QWidget(this);
+//    setCentralWidget(centralWidget);
 };
 
 #endif // MAINWINDOW_H
