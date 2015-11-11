@@ -17,3 +17,4 @@ INCLUDEPATH += $$(HOME)/NGL/include/
 INCLUDEPATH +=$$PWD/include
 
 OTHER_FILES+=$$PWD/shaders/*
+CONFIG +=c++11
