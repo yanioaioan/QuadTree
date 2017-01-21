@@ -251,6 +251,7 @@ void NGLScene::getPointCollisions(Point &a, QuadTree *tree)
             ///
             ngl::Colour collisionAreaColour(ngl::Random::instance ()->randomPositiveNumber (), ngl::Random::instance ()->randomPositiveNumber (), ngl::Random::instance ()->randomPositiveNumber (), 1);
 
+            //**THIS could be the vector to test against (in ex. for neighbour search)**
             std::vector<Point> *collisionAreaPoints = &tree->container;
 
 //            std::vector<Point> * t=&tree->container;
