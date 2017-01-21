@@ -11,7 +11,12 @@
 #include <ngl/Text.h>
 #include <QOpenGLWidget>
 
+#include <nglscene.h>
+
 //unsigned static int maxCapacity;
+
+const static int totalCollisionObjects=100;
+
 
  struct Point
  {
@@ -43,13 +48,16 @@
 
      }
 
-
-     unsigned int maxCapacity=200;
+    //when maxCapacity is equal to totalCollisionObjects,
+     //then this means we contain everything in the root
+     const size_t spliInNodes=10;
+     unsigned int maxCapacity=totalCollisionObjects/spliInNodes;
 
      void split()
      {
          float halfwidth =width /2;
          float halfheight =height /2;
+         //create 4 sub-trees based on the width&height of the parent Quadtree
          dl =new QuadTree(x,y,halfwidth,halfheight);
          dr =new QuadTree(x +halfwidth,y,halfwidth,halfheight);
          ul =new QuadTree(x,y +halfheight,halfwidth,halfheight);
@@ -67,16 +75,20 @@
      void addPoint(Point &a)
      {
          //std::cout <<x <<std::endl;
+         //ensure within the quad boundairies
          if(a.x >=x &&a.y >=y &&a.x <x +width &&a.y <y +height)
          {
              if(ul ==NULL)
              {
+                 //add the this node's container the points inserted
                  container.push_back(a);
+                 //when the container of this node has exceeded the max specified children..SPLIT()
                  if (container.size()>maxCapacity)
                      split();
              }
              else
              {
+                 //if the area already has a point, then assign it the appropriate quadrant
                  ul->addPoint(a);
                  ur->addPoint(a);
                  dl->addPoint(a);

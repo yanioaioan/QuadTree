@@ -8,7 +8,6 @@
 #include <ngl/Random.h>
 #include <QTime>
 
-const static int totalCollisionObjects=10000;
 
 //Initialize QuadTree
 QuadTree tree(0,0,totalCollisionObjects,totalCollisionObjects);
@@ -17,11 +16,11 @@ QuadTree tree(0,0,totalCollisionObjects,totalCollisionObjects);
 //----------------------------------------------------------------------------------------------------------------------
 /// @brief the increment for x/y translation with mouse movement
 //----------------------------------------------------------------------------------------------------------------------
-const static float INCREMENT=0.01;
+const static float INCREMENT=0.1;
 //----------------------------------------------------------------------------------------------------------------------
 /// @brief the increment for the wheel zoom
 //----------------------------------------------------------------------------------------------------------------------
-const static float ZOOM=0.1;
+const static float ZOOM=5;
 static int m_frames=0;
 QTime currenttime;
 double tmpTimeElapsed=0;
@@ -37,16 +36,16 @@ NGLScene::NGLScene()
     // mouse rotation values set to 0
     m_spinXFace=0;
     m_spinYFace=0;
-    updateTimer=startTimer(0);
+    updateTimer=startTimer(1000);
     m_animate=true;
 
 }
 
 NGLScene::~NGLScene()
 {
-    ngl::NGLInit *Init = ngl::NGLInit::instance();
+//    ngl::NGLInit *Init = ngl::NGLInit::instance();
     std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
-    Init->NGLQuit();
+//    Init->NGLQuit();
 }
 
 void NGLScene::initializeGL ()
@@ -55,7 +54,7 @@ void NGLScene::initializeGL ()
     glClearColor (0.4,0.4,0.4,1);
     std::cout<<"Initializing NGL\n";
 
-    ngl::Vec3 from(2,0.4,1);ngl::Vec3 to(0.5,0.4,0);ngl::Vec3 up(0,1,0);
+    ngl::Vec3 from(100,200,200);ngl::Vec3 to(0,0,0);ngl::Vec3 up(0,1,0);
     m_cam = new ngl::Camera(from,to,up);
     m_cam->setShape(45,(float)720/576,0.05,350);
 
@@ -86,8 +85,8 @@ void NGLScene::initializeGL ()
     for(int i=0;i<totalCollisionObjects;i++)
     {
        ngl::Random *rng=ngl::Random::instance ();
-       int x = (int)rng->randomPositiveNumber (totalCollisionObjects);
-       int y = (int)rng->randomPositiveNumber (totalCollisionObjects);
+       int x = (int)rng->randomNumber(100);
+       int y = (int)rng->randomPositiveNumber (100);
 
        //save positions
        Point t(x,y);
@@ -261,12 +260,12 @@ void NGLScene::getPointCollisions(Point &a, QuadTree *tree)
 //            }
 
             //Check collisions and push cube that collide with eachother further apart
-            detectAndResolveCollisions( (*element), collisionAreaPoints, tree->width, tree->height);
+//            detectAndResolveCollisions( (*element), collisionAreaPoints, tree->width, tree->height);
 
             for(int i=0;i<collisionAreaPoints->size ();i++)
             {
-                m_transform.setPosition ( (*collisionAreaPoints)[i].x/totalCollisionObjects ,(*collisionAreaPoints)[i].y/totalCollisionObjects, 0);
-                m_transform.setScale (0.01, 0.01, 1);
+                m_transform.setPosition ( (*collisionAreaPoints)[i].x/*/totalCollisionObjects*/ ,(*collisionAreaPoints)[i].y/*/totalCollisionObjects*/, 0);
+//                m_transform.setScale (0.01, 0.01, 1);
 
                 loadMatricesToShader (m_transform,m_mouseGlobalTX, m_cam, collisionAreaColour);
                 ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance ();
@@ -298,7 +297,7 @@ void NGLScene::getPointCollisions(Point &a, QuadTree *tree)
 
 
     }
-    else//if it's a branch , find if one of the 4 sub-areas intersects with the searched area
+    else//if it's a branch , find if one of the 4 sub-areas intersects with the searched area / and if yes..then draw it there in that area
     {
 
         if (a.x >= tree->dl->x && a.x <= tree->dl->x+tree->dl->width &&
@@ -341,7 +340,7 @@ void NGLScene::findTreeElements(QuadTree &tree)
         for(int i=0;i<collisionAreaPoints.size ();i++)
         {
             m_transform.setPosition (collisionAreaPoints[i].x ,collisionAreaPoints[i].y, 0);
-            m_transform.setScale (0.015,0.015,0.015);
+//            m_transform.setScale (0.015,0.015,0.015);
 
             loadMatricesToShader (m_transform,m_mouseGlobalTX, m_cam, collisionAreaColour);
             ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance ();
@@ -478,8 +477,8 @@ void NGLScene::paintGL ()
 
 //        for(int i=0;i<treePositions.size ();i++)
 //        {
-//            m_transform.setPosition (treePositions[i].x/totalCollisionObjects ,treePositions[i].y/totalCollisionObjects, 0);
-//            m_transform.setScale (0.015,0.015,0.015);
+//            m_transform.setPosition (treePositions[i].x/*/totalCollisionObjects*/ ,treePositions[i].y/*/totalCollisionObjects*/, 0);
+////            m_transform.setScale (0.015,0.015,0.015);
 
 //            ngl::Colour collisionAreaColour(1,0,0,1);
 //            loadMatricesToShader (m_transform,m_mouseGlobalTX, m_cam, collisionAreaColour);
