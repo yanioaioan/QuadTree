@@ -19,7 +19,6 @@ HEADERS += include/*.h \
 
 OBJECTS_DIR+=obj
 
-
 OTHER_FILES+=$$PWD/shaders/*
 CONFIG +=c++11
 

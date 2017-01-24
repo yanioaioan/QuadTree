@@ -36,16 +36,14 @@ NGLScene::NGLScene()
     // mouse rotation values set to 0
     m_spinXFace=0;
     m_spinYFace=0;
-    updateTimer=startTimer(1000);
+    updateTimer=startTimer(0);
     m_animate=true;
 
 }
 
 NGLScene::~NGLScene()
 {
-//    ngl::NGLInit *Init = ngl::NGLInit::instance();
     std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
-//    Init->NGLQuit();
 }
 
 void NGLScene::initializeGL ()
@@ -70,16 +68,12 @@ void NGLScene::initializeGL ()
     shader->setShaderParam3f("lightPos",1,1,1);
     shader->setShaderParam4f("lightDiffuse",1,1,1,1);
 
-
-
     glEnable(GL_DEPTH_TEST);
     // enable multisampling for smoother drawing
     glEnable(GL_MULTISAMPLE);
 
     // as re-size is not explicitly called we need to do this.
    glViewport(0,0,width(),height());
-
-
 
     //Fill random 2D Values to Quatree
     for(int i=0;i<totalCollisionObjects;i++)
@@ -145,7 +139,7 @@ void NGLScene::loadMatricesToShader(ngl::Transformation &_transform, const ngl::
 
 void NGLScene::detectAndResolveCollisions(Point &a, std::vector<Point> *collisionAreaPoints , const float & width, const float & height)
 {
-    for(int i=0;i<collisionAreaPoints->size ();i++)
+    for(size_t i=0;i<collisionAreaPoints->size ();i++)
     {
        if(a.x < (*collisionAreaPoints)[i].x+width &&
           a.x+width > (*collisionAreaPoints)[i].x &&
@@ -179,58 +173,6 @@ void NGLScene::detectAndResolveCollisions(Point &a, std::vector<Point> *collisio
 //This method used to be a member function of Quatree Structure
 void NGLScene::getPointCollisions(Point &a, QuadTree *tree)
 {
-//    //if tree node is a leaf node
-//    if (tree.dl==NULL && tree.dr==NULL && tree.ul==NULL && tree.ur==NULL)
-//    {
-
-
-
-//        std::find(tree.dl->container.begin(), tree.dl->container.end(), (a) );
-
-//        //found element
-////             if( std::find(tree.dl->container.begin(), tree.dl->container.end(), a) !=tree.dl->container.end() )
-//        {
-//            //print out container
-////                 for(std::vector<Point>::iterator iter=tree.dl->container.begin (); iter!=tree.dl->container.end (); iter++)
-////                 {
-////                     std::cout<<(*iter).x<<(*iter).y<<std::endl;
-////                 }
-//        }
-
-//        //if.......................
-
-//    }
-//    else//if it's a branch , find if one of the 4 sub-areas intersects with the searched area
-//    {
-
-////             dr =new QuadTree(x+halfwidth,y+halfheight, halfwidth,halfheight);
-
-
-
-//        //ul
-//        if (a.x >=tree.ul->x &&a.y >=tree.ul->y &&a.x <tree.ul->x +tree.ul->width /2 && a.y <tree.ul->y +tree.ul->height /2)
-//        {
-//            getPointCollisions (a,*(tree.ul));
-//        }
-//        //ur
-//        if (a.x >=tree.ur->x+tree.ur->width /2 &&a.y >=tree.ur->y &&a.x <tree.ur->x +tree.ur->width /2 && a.y <tree.ur->y +tree.ur->height /2)
-//        {
-//            getPointCollisions (a,*(tree.ur));
-//        }
-//        //dl
-//        if (a.x >=tree.dl->x &&a.y >=tree.dl->y+tree.dl->height /2 &&a.x <tree.dl->x +tree.dl->width /2 && a.y <tree.dl->y +tree.dl->height /2)
-//        {
-//            getPointCollisions (a,*(tree.dl));
-//        }
-//        //dr
-//        if (a.x >=tree.dr->x+tree.dr->width /2  &&a.y >=tree.dr->y+tree.dr->height /2 &&a.x <tree.dr->x +tree.dr->width /2 && a.y <tree.dr->y +tree.dr->height /2)
-//        {
-//            getPointCollisions (a,*(tree.dr));
-//        }
-
-//    }
-
-
     //if tree node is a leaf node
     if ( (tree->ul==NULL && tree->ur==NULL && tree->dl==NULL && tree->dr==NULL) /*&&  std::find(tree->container.begin(), tree->container.end(), a) !=tree->container.end()*/ )
     {
@@ -238,13 +180,6 @@ void NGLScene::getPointCollisions(Point &a, QuadTree *tree)
         std::vector<Point>::iterator element=std::find(tree->container.begin(), tree->container.end(), a);
         if( element !=tree->container.end ())//found element
         {
-            //print out THE WHOLE container
-//                  for(std::vector<Point>::iterator iter=tree->container.begin (); iter!=tree->container.end (); iter++)
-//                  {
-//                      std::cout<<"Point="<<(*iter).x<<","<<(*iter).y<<std::endl;
-//                  }
-
-
             /////////////////////       !!!!!!!!!!!!!!!!!
             /// \Section Added - For each element  of the tree that we search, we print the whole container using a another colour.
             /// Each neighbourhood should now have a different separate colour
@@ -254,16 +189,12 @@ void NGLScene::getPointCollisions(Point &a, QuadTree *tree)
             //**THIS could be the vector to test against (in ex. for neighbour search)**
             std::vector<Point> *collisionAreaPoints = &tree->container;
 
-//            std::vector<Point> * t=&tree->container;
-//            for(int i=0;i<t->size ();i++)
-//            {
-//                (*t)[i].x=0;
-//            }
+            std::cout<<"neighbours of point at position("<<a.x<<","<<a.y<<") are="<<collisionAreaPoints->size()<<" out of all "<<totalCollisionObjects<<'\n';
 
             //Check collisions and push cube that collide with eachother further apart
 //            detectAndResolveCollisions( (*element), collisionAreaPoints, tree->width, tree->height);
 
-            for(int i=0;i<collisionAreaPoints->size ();i++)
+            for(size_t i=0;i<collisionAreaPoints->size ();i++)
             {
                 m_transform.setPosition ( (*collisionAreaPoints)[i].x/*/totalCollisionObjects*/ ,(*collisionAreaPoints)[i].y/*/totalCollisionObjects*/, 0);
 //                m_transform.setScale (0.01, 0.01, 1);
@@ -272,30 +203,10 @@ void NGLScene::getPointCollisions(Point &a, QuadTree *tree)
                 ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance ();
                 prim->draw ("cube");
 
-
-//                std::cout<<"collisionAreaPoints.size ()="<<collisionAreaPoints.size ()<<std::endl;
             }
-            /////////////////////       !!!!!!!!!!!!!!!!!
-
-
-//           std::cout<<"Search Point="<<(*element).x<<","<<(*element).y<<std::endl;
-//           for(std::vector<Point>::iterator iter=tree->container.begin (); iter!=tree->container.end (); iter++)
-//           {
-//               if(!((*iter)==a))
-//               {
-//                   std::cout<<"Collision Neighbour Point="<<(*iter).x<<","<<(*iter).y<<std::endl;
-//               }
-//               else
-//               {
-//                   std::cout<<"No Collision Point Found"<<std::endl;
-//               }
-//           }
-
 
              return;
         }
-
-
 
     }
     else//if it's a branch , find if one of the 4 sub-areas intersects with the searched area / and if yes..then draw it there in that area
@@ -327,57 +238,6 @@ void NGLScene::getPointCollisions(Point &a, QuadTree *tree)
     }
 
 }
-
-//Is used to visualize different levels of the QuadTree But it's not quite working at the moment!
-void NGLScene::findTreeElements(QuadTree &tree)
-{
-
-    if (tree.container.size ()!=0 /*|| tree.dl!=NULL  || tree.dr!=NULL  || tree.ul!=NULL  || tree.ur!=NULL*/)
-    {
-        ngl::Colour collisionAreaColour(ngl::Random::instance ()->randomPositiveNumber (), ngl::Random::instance ()->randomPositiveNumber (), ngl::Random::instance ()->randomPositiveNumber (), 1);
-
-        std::vector<Point> collisionAreaPoints(tree.container);
-
-        for(int i=0;i<collisionAreaPoints.size ();i++)
-        {
-            m_transform.setPosition (collisionAreaPoints[i].x ,collisionAreaPoints[i].y, 0);
-//            m_transform.setScale (0.015,0.015,0.015);
-
-            loadMatricesToShader (m_transform,m_mouseGlobalTX, m_cam, collisionAreaColour);
-            ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance ();
-            prim->draw ("cube");
-
-        }
-
-
-
-    }
-    else
-    {
-        return;
-    }
-
-
-    if (tree.ul!=NULL)
-    {
-        findTreeElements(*(tree.ul));
-    }
-    if (tree.ur!=NULL)
-    {
-        findTreeElements(*(tree.ur));
-    }
-    if (tree.dl!=NULL)
-    {
-        findTreeElements(*(tree.dl));
-    }
-    if (tree.dr!=NULL)
-    {
-        findTreeElements(*(tree.dr));
-    }
-
-}
-
-
 
 
 void NGLScene::deleteAreaByAreaElements(QuadTree &tree)
@@ -414,22 +274,18 @@ void NGLScene::deleteAreaByAreaElements(QuadTree &tree)
     //Comment out some of the following quadtree collision regions and PushButton on the Gui, to delete some of the 1st level quatree splits (1 of the 4 first quadrants of the quadtree)
     if (tree.ul!=NULL)
     {
-//        tree.ul->container.clear ();
         update ();
     }
     if (tree.ur!=NULL)
     {
-//        tree.ur->container.clear ();
         update ();
     }
     if (tree.dl!=NULL)
     {
-//        tree.dl->container.clear ();
         update ();
     }
     if (tree.dr!=NULL)
     {
-//        tree.dr->container.clear ();
         update ();
     }
 
@@ -437,8 +293,6 @@ void NGLScene::deleteAreaByAreaElements(QuadTree &tree)
 
 void NGLScene::paintGL ()
 {
-
-
     ngl::ShaderLib *shader=ngl::ShaderLib::instance();
     (*shader)["nglDiffuseShader"]->use();
 
@@ -459,40 +313,10 @@ void NGLScene::paintGL ()
     m_mouseGlobalTX.m_m[3][2] = m_modelPos.m_z;
 
 
-    //
-
-//    findTreeElements(tree);
-
-//    for(int i=0;i<totalCollisionObjects;i++)
-//    {
-//       Point a(i,i);
-//       getPointCollisions(a,&tree);
-//    }
-
-
         for(unsigned int i=0;i<treePositions.size ();i++)
         {
            getPointCollisions(treePositions[i],&tree);
         }
-
-
-//        for(int i=0;i<treePositions.size ();i++)
-//        {
-//            m_transform.setPosition (treePositions[i].x/*/totalCollisionObjects*/ ,treePositions[i].y/*/totalCollisionObjects*/, 0);
-////            m_transform.setScale (0.015,0.015,0.015);
-
-//            ngl::Colour collisionAreaColour(1,0,0,1);
-//            loadMatricesToShader (m_transform,m_mouseGlobalTX, m_cam, collisionAreaColour);
-//            ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance ();
-//            prim->draw ("cube");
-
-//        }
-
-
-
-//    glRectd(tree.x, tree.y, tree.width, tree.height);
-
-
 
         QString text;
         text.sprintf ("Framerate is %d", fps);
